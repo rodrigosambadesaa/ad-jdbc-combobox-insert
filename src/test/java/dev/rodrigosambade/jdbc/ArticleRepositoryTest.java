@@ -1,15 +1,29 @@
 package dev.rodrigosambade.jdbc;
-import org.junit.jupiter.api.Test;
+
 import java.math.BigDecimal;
-import static org.junit.jupiter.api.Assertions.*;
-class ArticleRepositoryTest{
-    @Test void inserts()throws Exception{
-        try(var c=DemoDatabase.open()){
-            var r=new ArticleRepository();
-            int before=r.all(c).size();
-            var a=r.insert(c,"Nuevo","Demo",new BigDecimal("12.50"));
-            assertTrue(a.id()>0);
-            assertEquals(before+1,r.all(c).size());
+import java.sql.Connection;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class ArticleRepositoryTest {
+
+    @Test
+    void insertsArticleAndReturnsGeneratedIdentifier() throws Exception {
+        try (Connection connection = DemoDatabase.open()) {
+            ArticleRepository repository = new ArticleRepository();
+            int articlesBeforeInsert = repository.all(connection).size();
+
+            Article inserted = repository.insert(
+                    connection,
+                    "Nuevo",
+                    "Demo",
+                    new BigDecimal("12.50"));
+
+            assertTrue(inserted.id() > 0);
+            assertEquals(articlesBeforeInsert + 1, repository.all(connection).size());
         }
     }
 }
